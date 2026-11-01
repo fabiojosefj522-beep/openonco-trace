@@ -1,5 +1,9 @@
 # OpenOnco-Trace
 
+[![CI](https://github.com/fabiojosefj522-beep/openonco-trace/actions/workflows/ci.yml/badge.svg)](https://github.com/fabiojosefj522-beep/openonco-trace/actions/workflows/ci.yml)
+
+**Demo online:** https://fabiojosefj522-beep.github.io/openonco-trace/ · [versão em arquivo único](https://fabiojosefj522-beep.github.io/openonco-trace/dist/openonco-trace-standalone.html)
+
 Rastreabilidade de custódia e validação de amostras biológicas para terapias personalizadas contra o câncer (CAR-T autólogo e vacinas de mRNA com neoantígenos), no modelo open-core.
 
 ## Como rodar
@@ -63,6 +67,11 @@ O fluxo de A a Z cobre:
 - detecção de adulteração;
 - excursão térmica;
 - os seis cenários.
+
+## CI e publicação
+
+- `.github/workflows/ci.yml` roda `npm test` em todo pull request e em todo push na `main`.
+- `.github/workflows/pages.yml` publica a demo no GitHub Pages a cada push na `main`. Para funcionar, é preciso ligar uma vez em **Settings > Pages > Source = GitHub Actions**.
 
 ## Licença
 
