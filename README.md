@@ -6,16 +6,27 @@ Rastreabilidade de custódia e validação de amostras biológicas para terapias
 
 Abra `index.html` no navegador. Não há build, dependências nem chamadas de rede: a API Enterprise é simulada em memória. Siga o roteiro de 6 passos no topo da página.
 
+Para uma versão em arquivo único (para enviar por e-mail ou abrir offline): `npm run build`, que gera `dist/openonco-trace-standalone.html`.
+
 ## Estrutura
 
-Tudo está em `index.html`. Cada bloco `<script>` corresponde a um futuro pacote:
+```
+openonco-trace/
+├── index.html                      demo (carrega os arquivos abaixo)
+├── packages/
+│   ├── sdk/openonco-sdk.js         PARTE A · @openonco/sdk (Apache-2.0)
+│   │                               JSON Schema, validador, SHA-256, regras, OpenOncoSDK
+│   └── badge/onco-badge.js         PARTE A · @openonco/badge (Apache-2.0)
+│                                   Web Component <onco-badge>
+├── mock/enterprise-mock.js         PARTE Z · simulação pública do contrato da API Enterprise
+├── demo/demo.js                    harness da demo (cenários, editor, painéis)
+├── scripts/build-standalone.js     gera a demo em arquivo único em dist/
+└── test/                           testes ponta a ponta (Playwright)
+```
 
-| Bloco | Parte | Conteúdo |
-|---|---|---|
-| `#oot-sdk` | A, open source | JSON Schema da amostra, validador, canonicalização + SHA-256, motor de regras, classe `OpenOncoSDK` |
-| `#oot-badge` | A, open source | Web Component `<onco-badge>` (Shadow DOM, modo `compact`, evento `oot-validated`) |
-| `#oot-enterprise-mock` | Z, Enterprise | Contrato da API e servidor simulado: licença por `X-API-Key`, hash SHA-256, assinatura ES256, selo de conformidade, trilha de auditoria encadeada |
-| `#oot-demo` | — | Harness da demonstração |
+Os pacotes são scripts clássicos (expõem `window.OpenOncoSDK`, `window.OpenOnco` e o elemento `<onco-badge>`), por isso a demo funciona direto de `file://`.
+
+**Sobre a Parte Z:** este repositório traz só uma simulação do contrato, para integradores testarem sem rede e sem licença. O servidor Enterprise real (licenciamento, chave de assinatura em HSM/KMS, trilha de auditoria append-only, carimbo de tempo RFC 3161) é proprietário e fica fora daqui.
 
 Modelo de confiança: verificar é aberto, emitir é pago. O SDK livre confere o selo (hash + chave pública via JWKS); só o servidor licenciado o emite.
 
@@ -33,9 +44,22 @@ Modelo de confiança: verificar é aberto, emitir é pago. O SDK livre confere o
 Requer Node e Playwright com Chromium.
 
 ```bash
-node test/flow.test.js       # fluxo A→Z: sandbox, chave inválida, Enterprise, adulteração, excursão térmica, cenários
-node test/insecure.test.js   # contexto não seguro: fallback de SHA-256 em JS puro
+npm test
 ```
+
+Roda o build em arquivo único e depois três suítes. A primeira testa o fluxo de A a Z em `index.html`. A segunda repete o fluxo no build em arquivo único. A terceira abre a página num contexto não seguro e confere o fallback de SHA-256 em JS puro.
+
+O fluxo de A a Z cobre:
+
+- sandbox sem chave e com chave inválida;
+- chave Enterprise;
+- detecção de adulteração;
+- excursão térmica;
+- os seis cenários.
+
+## Licença
+
+Apache-2.0 (ver `LICENSE` e `NOTICE`).
 
 ## Avisos para produção
 

@@ -1,0 +1,11 @@
+{
+  "name": "@openonco/sdk",
+  "version": "1.0.0",
+  "description": "SDK open source do OpenOnco-Trace: JSON Schema da amostra, validação local, regras de custódia e cliente da API de validação.",
+  "license": "Apache-2.0",
+  "main": "openonco-sdk.js",
+  "browser": "openonco-sdk.js",
+  "files": ["openonco-sdk.js", "README.md"],
+  "keywords": ["chain-of-custody", "chain-of-identity", "car-t", "mrna", "gxp", "21-cfr-part-11"],
+  "sideEffects": true
+}

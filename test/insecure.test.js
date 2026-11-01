@@ -6,9 +6,16 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const html = fs.readFileSync(path.resolve(__dirname, '..', 'index.html'));
+const ROOT = path.resolve(__dirname, '..');
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
 const ip = Object.values(os.networkInterfaces()).flat().find((i) => i && i.family === 'IPv4' && !i.internal).address;
-const server = http.createServer((req, res) => { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(html); }).listen(8765, '0.0.0.0');
+// Servidor estático mínimo: entrega index.html e os scripts dos pacotes.
+const server = http.createServer((req, res) => {
+  const file = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname));
+  if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); res.end(); return; }
+  res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });
+  res.end(fs.readFileSync(file));
+}).listen(8765, '0.0.0.0');
 
 (async () => {
   const browser = await chromium.launch();
