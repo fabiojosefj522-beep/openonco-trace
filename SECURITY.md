@@ -10,7 +10,7 @@ O OpenOnco-Trace lida com rastreabilidade de material biológico usado em terapi
 
 ## Como reportar uma vulnerabilidade
 
-**Não abra issue pública.** Use o reporte privado do GitHub: aba **Security** do repositório > **Report a vulnerability**.
+**Não abra issue pública.** Use o reporte privado do GitHub: aba **Security** do repositório > **Advisories** > **Report a vulnerability**.
 
 Inclua:
 - componente afetado (`@openonco/sdk`, `@openonco/badge`, contrato OpenAPI ou mock);
