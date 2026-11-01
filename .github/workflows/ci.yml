@@ -1,0 +1,47 @@
+# Roda a suíte completa (fluxo A→Z, build standalone, contexto não seguro e contrato OpenAPI)
+# em todo pull request e em todo push na main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Dependências de teste
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python -m pip install pyyaml jsonschema
+
+      - name: npm test
+        run: npm test
+
+      - name: Screenshots dos testes (se houver falha)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test/*.png
+          if-no-files-found: ignore
