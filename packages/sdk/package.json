@@ -3,9 +3,51 @@
   "version": "1.0.0",
   "description": "SDK open source do OpenOnco-Trace: JSON Schema da amostra, validação local, regras de custódia e cliente da API de validação.",
   "license": "Apache-2.0",
-  "main": "openonco-sdk.js",
-  "browser": "openonco-sdk.js",
-  "files": ["openonco-sdk.js", "README.md"],
-  "keywords": ["chain-of-custody", "chain-of-identity", "car-t", "mrna", "gxp", "21-cfr-part-11"],
-  "sideEffects": true
+  "keywords": [
+    "chain-of-custody",
+    "chain-of-identity",
+    "car-t",
+    "mrna",
+    "gxp",
+    "21-cfr-part-11"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabiojosefj522-beep/openonco-trace.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://fabiojosefj522-beep.github.io/openonco-trace/",
+  "bugs": "https://github.com/fabiojosefj522-beep/openonco-trace/issues",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./openonco-sdk.js": "./openonco-sdk.js",
+    "./package.json": "./package.json"
+  },
+  "jsdelivr": "openonco-sdk.js",
+  "unpkg": "openonco-sdk.js",
+  "files": [
+    "dist",
+    "types",
+    "index.d.ts",
+    "openonco-sdk.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": [
+    "./openonco-sdk.js"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }

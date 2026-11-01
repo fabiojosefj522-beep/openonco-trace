@@ -1,0 +1,54 @@
+# Publica @openonco/sdk e @openonco/badge no npm quando uma tag vX.Y.Z é enviada.
+# Requer o segredo NPM_TOKEN (token "Automation" ou granular com permissão de publicação
+# na organização @openonco). Sem o segredo, o workflow só testa e avisa, sem falhar.
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+  id-token: write   # proveniência npm (supply chain verificável)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Confere que a tag bate com a versão dos pacotes
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          for p in packages/sdk packages/badge; do
+            V=$(node -p "require('./$p/package.json').version")
+            [ "$V" = "$TAG" ] || { echo "::error::$p está na versão $V, mas a tag é $GITHUB_REF_NAME"; exit 1; }
+          done
+
+      - name: Testes
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python -m pip install pyyaml jsonschema
+          npm test
+
+      - name: Publica no npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::warning::Segredo NPM_TOKEN ausente: pacotes testados, mas não publicados."
+            exit 0
+          fi
+          npm publish --workspace packages/sdk --access public --provenance
+          npm publish --workspace packages/badge --access public --provenance

@@ -526,7 +526,7 @@
     /**
      * Envia a amostra para validação. `target` = sampleId rastreado ou objeto de amostra.
      * Nunca lança por erro de negócio: o resultado sempre diz o modo e o estágio.
-     *   mode:  ENTERPRISE | SANDBOX | LOCAL | OFFLINE
+     *   mode:  ENTERPRISE | SANDBOX | LOCAL | OFFLINE | ERROR
      *   stage: SEALED | SEAL_INVALID | SANDBOX | SCHEMA | NETWORK | HTTP_ERROR
      */
     async submit(target, { signatureMeaning = 'REVIEW_APPROVAL' } = {}) {
@@ -627,7 +627,7 @@
       const code = (body && body.error && body.error.code) || `HTTP_${res.status}`;
       const message = (body && body.error && body.error.message) || res.statusText;
       this.#log('error', `HTTP ${res.status} ${code}: ${message}`);
-      return finish({ ok: false, mode: this.#mode, stage: 'HTTP_ERROR', regulatoryValidity: false, status: local.status, findings: local.findings, evaluation: local, error: `${code}: ${message}`, response: body, sample, http });
+      return finish({ ok: false, mode: 'ERROR', stage: 'HTTP_ERROR', regulatoryValidity: false, status: local.status, findings: local.findings, evaluation: local, error: `${code}: ${message}`, response: body, sample, http });
     }
 
     /**
