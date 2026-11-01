@@ -6,11 +6,26 @@
 
 Rastreabilidade de custódia e validação de amostras biológicas para terapias personalizadas contra o câncer (CAR-T autólogo e vacinas de mRNA com neoantígenos), no modelo open-core.
 
-## Como rodar
+## Instalação
+
+```bash
+npm install @openonco/sdk @openonco/badge
+```
+
+Enquanto os pacotes não estão no npm, use o jsDelivr direto do GitHub:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/fabiojosefj522-beep/openonco-trace@v1.0.0/packages/sdk/openonco-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fabiojosefj522-beep/openonco-trace@v1.0.0/packages/badge/onco-badge.js"></script>
+```
+
+Cada pacote tem seu README: [`@openonco/sdk`](packages/sdk/README.md) e [`@openonco/badge`](packages/badge/README.md). Os dois funcionam como ES module, CommonJS (só o SDK) e `<script>`, com tipos TypeScript.
+
+## Como rodar a demo
 
 Abra `index.html` no navegador. Não há build, dependências nem chamadas de rede: a API Enterprise é simulada em memória. Siga o roteiro de 6 passos no topo da página.
 
-Para uma versão em arquivo único (para enviar por e-mail ou abrir offline): `npm run build`, que gera `dist/openonco-trace-standalone.html`.
+`npm run build` regenera as saídas dos pacotes (`packages/*/dist`, tipos e schema exportado) e a demo em arquivo único, em `dist/openonco-trace-standalone.html`.
 
 ## Estrutura
 
@@ -18,7 +33,7 @@ Para uma versão em arquivo único (para enviar por e-mail ou abrir offline): `n
 openonco-trace/
 ├── index.html                      demo (carrega os arquivos abaixo)
 ├── packages/
-│   ├── sdk/openonco-sdk.js         PARTE A · @openonco/sdk (Apache-2.0)
+│   ├── sdk/openonco-sdk.js         PARTE A · @openonco/sdk (Apache-2.0); dist/ e types/ são gerados
 │   │                               JSON Schema, validador, SHA-256, regras, OpenOncoSDK
 │   └── badge/onco-badge.js         PARTE A · @openonco/badge (Apache-2.0)
 │                                   Web Component <onco-badge>
@@ -27,6 +42,7 @@ openonco-trace/
 │   └── schemas/OpenOncoSample.json gerado do SDK (npm run schema)
 ├── mock/enterprise-mock.js         PARTE Z · simulação pública do contrato da API Enterprise
 ├── demo/demo.js                    harness da demo (cenários, editor, painéis)
+├── scripts/build-packages.js       gera ESM, CommonJS e tipos da amostra dos pacotes
 ├── scripts/build-standalone.js     gera a demo em arquivo único em dist/
 ├── scripts/export-schema.js        exporta o JSON Schema do SDK para o OpenAPI
 └── test/                           testes ponta a ponta (Playwright)
@@ -58,7 +74,7 @@ npm test               # tudo
 npm run test:contract  # só o contrato
 ```
 
-Roda o build em arquivo único e depois quatro suítes. A primeira testa o fluxo de A a Z em `index.html`. A segunda repete o fluxo no build em arquivo único. A terceira abre a página num contexto não seguro e confere o fallback de SHA-256 em JS puro. A quarta é o teste de contrato: ela checa a estrutura do OpenAPI e confere cada resposta do mock e cada requisição do SDK contra os schemas, em todos os status documentados (200, 400, 402, 422, 429). Também confere que o schema exportado está em dia com o SDK.
+Confere que os arquivos gerados estão em dia, testa os pacotes (ESM, CommonJS, SSR, import map no navegador e tipos com `tsc`) e roda quatro suítes da demo. A primeira testa o fluxo de A a Z em `index.html`. A segunda repete o fluxo no build em arquivo único. A terceira abre a página num contexto não seguro e confere o fallback de SHA-256 em JS puro. A quarta é o teste de contrato: ela checa a estrutura do OpenAPI e confere cada resposta do mock e cada requisição do SDK contra os schemas, em todos os status documentados (200, 400, 402, 422, 429). Também confere que o schema exportado está em dia com o SDK.
 
 O fluxo de A a Z cobre:
 
@@ -71,7 +87,12 @@ O fluxo de A a Z cobre:
 ## CI e publicação
 
 - `.github/workflows/ci.yml` roda `npm test` em todo pull request e em todo push na `main`.
+- `.github/workflows/release.yml` publica os pacotes no npm, com proveniência, quando uma tag `vX.Y.Z` é enviada. Requer o segredo `NPM_TOKEN`; sem ele, apenas testa.
 - `.github/workflows/pages.yml` publica a demo no GitHub Pages a cada push na `main`. Para funcionar, é preciso ligar uma vez em **Settings > Pages > Source = GitHub Actions**.
+
+## Comunidade
+
+[Como contribuir](CONTRIBUTING.md) · [Política de segurança](SECURITY.md) · [Código de Conduta](CODE_OF_CONDUCT.md) · [Changelog](CHANGELOG.md)
 
 ## Licença
 

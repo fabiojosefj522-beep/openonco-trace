@@ -3,10 +3,45 @@
   "version": "1.0.0",
   "description": "Web Component <onco-badge> do OpenOnco-Trace: status de custódia em tempo real para SAP, Veeva Vault, WMS e apps web.",
   "license": "Apache-2.0",
-  "main": "onco-badge.js",
-  "browser": "onco-badge.js",
-  "files": ["onco-badge.js", "README.md"],
-  "peerDependencies": { "@openonco/sdk": "^1.0.0" },
-  "keywords": ["web-component", "custom-element", "chain-of-custody", "car-t", "mrna"],
-  "sideEffects": true
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "chain-of-custody",
+    "car-t",
+    "mrna"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabiojosefj522-beep/openonco-trace.git",
+    "directory": "packages/badge"
+  },
+  "homepage": "https://fabiojosefj522-beep.github.io/openonco-trace/",
+  "bugs": "https://github.com/fabiojosefj522-beep/openonco-trace/issues",
+  "module": "dist/index.mjs",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "./onco-badge.js": "./onco-badge.js",
+    "./package.json": "./package.json"
+  },
+  "jsdelivr": "onco-badge.js",
+  "unpkg": "onco-badge.js",
+  "files": [
+    "dist",
+    "index.d.ts",
+    "onco-badge.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@openonco/sdk": "^1.0.0"
+  },
+  "sideEffects": true,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }
