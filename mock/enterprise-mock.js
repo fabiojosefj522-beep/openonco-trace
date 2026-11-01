@@ -15,9 +15,11 @@
   const BASE_URL = DEFAULT_ENDPOINT;
   const ORIGIN = new URL(BASE_URL).origin;
 
-  /* ── Contrato da API: fonte única da documentação exibida na página ── */
+  /* ── Resumo do contrato exibido na página. A fonte normativa é o OpenAPI em
+     openapi/openonco-trace.v1.yaml; test/contract.test.js garante que este mock o cumpre. ── */
   const API_CONTRACT = {
     api: 'OpenOnco-Trace Enterprise Validation API',
+    specification: 'openapi/openonco-trace.v1.yaml (OpenAPI 3.1, normativo)',
     version: 'v1 (2026-11-01)',
     baseUrl: BASE_URL,
     authentication: {

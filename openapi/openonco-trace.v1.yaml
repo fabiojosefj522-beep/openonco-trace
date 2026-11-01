@@ -1,0 +1,476 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+
+info:
+  title: OpenOnco-Trace Enterprise Validation API
+  version: 1.0.0
+  summary: Validação de custódia de amostras biológicas, com selo regulatório no plano Enterprise.
+  description: |
+    Contrato normativo da API usada pelo `@openonco/sdk`. A Parte A (SDK e componente) é open source;
+    a emissão de hash selado, assinatura, selo de conformidade e trilha de auditoria é o produto Enterprise.
+
+    **Modelo de licença**
+    - Sem `X-API-Key`, ou com chave inválida: `402` e modo sandbox. A avaliação vem, mas sem validade
+      regulatória, sem hash, sem assinatura, sem selo e sem trilha.
+    - Com chave Enterprise válida: `200`, com tudo isso.
+
+    **Segurança:** a chave nunca vai para o navegador. O sistema hospedeiro (SAP, Veeva Vault, WMS) chama a
+    API pelo próprio backend (BFF/proxy) ou entrega ao front um token OAuth2 de curta duração.
+
+    **Verificação aberta:** qualquer cliente confere um selo recalculando o SHA-256 do payload
+    (canonicalização OOT-C14N/1, inspirada no RFC 8785) e validando a assinatura ES256 com a chave
+    pública publicada em `/.well-known/jwks.json`.
+
+    Conformidade com 21 CFR Part 11 e Anvisa (RDC 658/2022, IN 134/2022, IN 270/2023) depende também de
+    validação do sistema computadorizado e de procedimentos; a API fornece os controles técnicos.
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+
+servers:
+  - url: https://api.openonco-trace.example/v1
+    description: Simulado em memória por mock/enterprise-mock.js (domínio reservado, RFC 2606)
+
+tags:
+  - name: Validação
+  - name: Verificação aberta
+  - name: Auditoria
+
+paths:
+  /custody/validate:
+    post:
+      tags: [Validação]
+      operationId: validateCustody
+      summary: Valida a custódia de uma amostra e, no plano Enterprise, emite o selo.
+      description: |
+        O servidor revalida o payload contra o JSON Schema (nunca confia no cliente) e aplica o mesmo motor
+        de regras aberto do SDK, usando o relógio do servidor como fonte de tempo confiável.
+        Reenvios com a mesma `Idempotency-Key` devolvem o mesmo selo, sem criar novo registro na trilha.
+      security:
+        - {}
+        - ApiKey: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/SdkVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateRequest'
+      responses:
+        '200':
+          description: Enterprise. Avaliação, hash SHA-256, assinatura ES256, selo e registro na trilha de auditoria.
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+            X-OOT-Tier: { $ref: '#/components/headers/TierEnterprise' }
+            Idempotent-Replayed: { $ref: '#/components/headers/IdempotentReplayed' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseValidation'
+        '400':
+          $ref: '#/components/responses/MalformedJson'
+        '402':
+          description: Sandbox. Limitação de uso comercial; avaliação sem validade regulatória.
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+            X-OOT-Tier: { $ref: '#/components/headers/TierSandbox' }
+            X-RateLimit-Limit: { $ref: '#/components/headers/RateLimitLimit' }
+            X-RateLimit-Remaining: { $ref: '#/components/headers/RateLimitRemaining' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxValidation'
+        '422':
+          description: Violação do schema da amostra (`OOT-422-SCHEMA_VIOLATION`) ou signatário ausente no plano Enterprise (`OOT-422-SIGNER_REQUIRED`).
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Cota sandbox esgotada (`OOT-429-SANDBOX_QUOTA_EXCEEDED`).
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+            Retry-After:
+              description: Segundos até a cota ser renovada.
+              schema: { type: string, pattern: '^[0-9]+$' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /.well-known/jwks.json:
+    get:
+      tags: [Verificação aberta]
+      operationId: getJwks
+      summary: Chaves públicas para verificar selos sem licença.
+      security: []
+      responses:
+        '200':
+          description: Conjunto de chaves (RFC 7517).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jwks'
+
+  /audit/ledger:
+    get:
+      tags: [Auditoria]
+      operationId: getAuditLedger
+      summary: Trilha de auditoria encadeada por hash do tenant.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: Registros em ordem de emissão. Cada `chainHash` depende do anterior.
+          headers:
+            X-OOT-Tier: { $ref: '#/components/headers/TierEnterprise' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ledger'
+        '402':
+          description: Recurso exclusivo Enterprise.
+          headers:
+            X-OOT-Tier: { $ref: '#/components/headers/TierSandbox' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Chave Enterprise. Enviar somente a partir de backend.
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: UUID v4 gerado por envio. Reenvios com a mesma chave devolvem o mesmo selo.
+      schema: { type: string, format: uuid }
+    SdkVersion:
+      name: X-OOT-SDK
+      in: header
+      required: false
+      schema: { type: string, examples: ['openonco-sdk-js/1.0.0'] }
+
+  headers:
+    RequestId:
+      required: true
+      schema: { type: string, pattern: '^req_[0-9a-f]{16}$' }
+    TierEnterprise:
+      required: true
+      schema: { type: string, const: ENTERPRISE }
+    TierSandbox:
+      required: true
+      schema: { type: string, const: SANDBOX }
+    RateLimitLimit:
+      required: true
+      schema: { type: string, pattern: '^[0-9]+$' }
+    RateLimitRemaining:
+      required: true
+      schema: { type: string, pattern: '^[0-9]+$' }
+    IdempotentReplayed:
+      required: false
+      schema: { type: string, const: 'true' }
+
+  responses:
+    MalformedJson:
+      description: Corpo não é JSON válido (`OOT-400-MALFORMED_JSON`).
+      headers:
+        X-Request-Id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    OpenOncoSample:
+      $ref: './schemas/OpenOncoSample.json'
+
+    Sha256Hex:
+      type: string
+      pattern: '^[0-9a-f]{64}$'
+
+    Status:
+      type: string
+      enum: [VERIFIED, WARNING, CRITICAL]
+      description: VERIFIED = verde, WARNING = atenção térmica (amarelo), CRITICAL = erro de paciente, viabilidade, custódia ou schema (vermelho).
+
+    Disposition:
+      type: string
+      enum: [RELEASE_FOR_PROCESSING, QUARANTINE_QA_REVIEW, REJECT_DO_NOT_PROCESS]
+
+    Operator:
+      type: object
+      additionalProperties: false
+      required: [userId, printedName]
+      description: Usuário autenticado no sistema hospedeiro. Obrigatório no plano Enterprise (21 CFR 11.50).
+      properties:
+        userId: { type: string, minLength: 1 }
+        printedName: { type: string, minLength: 1 }
+
+    ValidateRequest:
+      type: object
+      additionalProperties: false
+      required: [sample]
+      properties:
+        sample:
+          $ref: '#/components/schemas/OpenOncoSample'
+        context:
+          type: object
+          additionalProperties: false
+          properties:
+            operator:
+              anyOf:
+                - $ref: '#/components/schemas/Operator'
+                - type: 'null'
+            sourceSystem:
+              type: string
+              examples: [SAP, VEEVA, WMS, WEB]
+            signatureMeaning:
+              type: string
+              enum: [REVIEW_APPROVAL, RESPONSIBILITY, AUTHORSHIP]
+              default: REVIEW_APPROVAL
+            clientEvaluation:
+              type: object
+              description: Resultado da pré-validação local, apenas informativo; o servidor reavalia.
+              additionalProperties: false
+              properties:
+                status: { $ref: '#/components/schemas/Status' }
+                rulesVersion: { type: string }
+
+    Finding:
+      type: object
+      additionalProperties: false
+      required: [severity, category, code, message]
+      properties:
+        severity: { type: string, enum: [CRITICAL, WARNING] }
+        category: { type: string, enum: [PATIENT, THERMAL, VIABILITY, CUSTODY, SCHEMA] }
+        code:
+          type: string
+          examples: [COI_MISMATCH, MATERIAL_THERAPY_MISMATCH, THERMAL_CRITICAL, THERMAL_EXCURSION, THERMAL_NEAR_LIMIT, TELEMETRY_STALE, QC_BELOW_MIN, CUSTODY_START_INVALID, CUSTODY_FUTURE_TIMESTAMP, CUSTODY_OUT_OF_ORDER, STABILITY_WINDOW_EXCEEDED]
+        message: { type: string }
+
+    Evaluation:
+      type: object
+      additionalProperties: false
+      required: [status, disposition, findings, metrics, rulesVersion, evaluatedAt]
+      properties:
+        status: { $ref: '#/components/schemas/Status' }
+        disposition: { $ref: '#/components/schemas/Disposition' }
+        findings:
+          type: array
+          items: { $ref: '#/components/schemas/Finding' }
+        metrics:
+          type: object
+          additionalProperties: false
+          required: [deviationC, elapsedHours, windowHours]
+          properties:
+            deviationC: { type: number, minimum: 0, description: Maior desvio em °C além da faixa do perfil. }
+            elapsedHours: { type: [number, 'null'], description: Horas da coleta ao recebimento, ou até agora se em trânsito. }
+            windowHours: { type: number, description: Janela de estabilidade do perfil. }
+        rulesVersion: { type: string }
+        evaluatedAt: { type: string, format: date-time }
+
+    Integrity:
+      type: object
+      additionalProperties: false
+      required: [algorithm, canonicalization, payloadHash]
+      properties:
+        algorithm: { type: string, const: SHA-256 }
+        canonicalization: { type: string }
+        payloadHash: { $ref: '#/components/schemas/Sha256Hex' }
+
+    Signature:
+      description: Assinatura do `complianceSeal` canonicalizado. `NONE` só ocorre em ambientes sem Web Crypto (simulação).
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [algorithm, keyId, signedPayload, value, jwksUrl]
+          properties:
+            algorithm: { type: string, const: ES256 }
+            keyId: { type: string }
+            signedPayload: { type: string }
+            value: { type: string, pattern: '^[A-Za-z0-9_-]+$', description: Assinatura P-256 em formato IEEE P1363 (r||s), base64url. }
+            jwksUrl: { type: string, format: uri }
+        - type: object
+          additionalProperties: false
+          required: [algorithm, keyId, value, note]
+          properties:
+            algorithm: { type: string, const: NONE }
+            keyId: { type: 'null' }
+            value: { type: 'null' }
+            note: { type: string }
+
+    ComplianceSeal:
+      type: object
+      additionalProperties: false
+      required: [sealId, issuedAt, sampleId, payloadHash, status, disposition, tenant, licenseId, frameworks, signatureManifestation, auditTrail, timeSource]
+      properties:
+        sealId: { type: string, pattern: '^OOT-SEAL-[0-9]{8}-[0-9]{6}$' }
+        issuedAt: { type: string, format: date-time, description: Relógio do servidor. }
+        sampleId: { type: string }
+        payloadHash: { $ref: '#/components/schemas/Sha256Hex' }
+        status: { $ref: '#/components/schemas/Status' }
+        disposition: { $ref: '#/components/schemas/Disposition' }
+        tenant: { type: string }
+        licenseId: { type: string }
+        frameworks:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            additionalProperties: false
+            required: [ref, scope]
+            properties:
+              ref: { type: string }
+              scope: { type: string }
+        signatureManifestation:
+          type: object
+          description: 21 CFR 11.50 (nome impresso, data e hora, significado da assinatura).
+          additionalProperties: false
+          required: [printedName, userId, meaning, meaningLabel, signedAt]
+          properties:
+            printedName: { type: string }
+            userId: { type: string }
+            meaning: { type: string, enum: [REVIEW_APPROVAL, RESPONSIBILITY, AUTHORSHIP] }
+            meaningLabel: { type: string }
+            signedAt: { type: string, format: date-time }
+        auditTrail:
+          type: object
+          additionalProperties: false
+          required: [sequence, previousHash, chainHash, sourceSystem, requestId]
+          properties:
+            sequence: { type: integer, minimum: 1 }
+            previousHash: { $ref: '#/components/schemas/Sha256Hex' }
+            chainHash:
+              $ref: '#/components/schemas/Sha256Hex'
+              description: SHA-256 de "previousHash|payloadHash|sealId|issuedAt".
+            sourceSystem: { type: string }
+            requestId: { type: string }
+        timeSource: { type: string }
+
+    EnterpriseValidation:
+      type: object
+      additionalProperties: false
+      required: [requestId, tier, regulatoryValidity, evaluation, integrity, signature, complianceSeal]
+      properties:
+        requestId: { type: string }
+        tier: { type: string, const: ENTERPRISE }
+        regulatoryValidity: { type: boolean, const: true }
+        evaluation: { $ref: '#/components/schemas/Evaluation' }
+        integrity: { $ref: '#/components/schemas/Integrity' }
+        signature: { $ref: '#/components/schemas/Signature' }
+        complianceSeal: { $ref: '#/components/schemas/ComplianceSeal' }
+
+    SandboxValidation:
+      type: object
+      additionalProperties: false
+      required: [requestId, tier, regulatoryValidity, alert, evaluation, quota, integrity, signature, complianceSeal]
+      properties:
+        requestId: { type: string }
+        tier: { type: string, const: SANDBOX }
+        regulatoryValidity: { type: boolean, const: false }
+        alert:
+          type: object
+          additionalProperties: false
+          required: [code, reason, title, message, upgradeUrl]
+          properties:
+            code: { type: string, const: OOT-402-COMMERCIAL_USE_LIMITATION }
+            reason: { type: string, enum: [MISSING_API_KEY, INVALID_API_KEY] }
+            title: { type: string }
+            message: { type: string, description: Inclui o aviso "MODO SANDBOX (SEM VALIDADE REGULATÓRIA)". }
+            upgradeUrl: { type: string, format: uri }
+        evaluation: { $ref: '#/components/schemas/Evaluation' }
+        quota:
+          type: object
+          additionalProperties: false
+          required: [limit, used, remaining, window]
+          properties:
+            limit: { type: integer, minimum: 0 }
+            used: { type: integer, minimum: 0 }
+            remaining: { type: integer, minimum: 0 }
+            window: { type: string }
+        integrity: { type: 'null' }
+        signature: { type: 'null' }
+        complianceSeal: { type: 'null' }
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        requestId: { type: string }
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [OOT-400-MALFORMED_JSON, OOT-402-COMMERCIAL_USE_LIMITATION, OOT-404-NOT_FOUND, OOT-422-SCHEMA_VIOLATION, OOT-422-SIGNER_REQUIRED, OOT-429-SANDBOX_QUOTA_EXCEEDED, OOT-500-INTERNAL]
+            message: { type: string }
+            details:
+              type: array
+              description: Presente em OOT-422-SCHEMA_VIOLATION.
+              items:
+                type: object
+                additionalProperties: false
+                required: [path, keyword, message]
+                properties:
+                  path: { type: string, examples: ['$.sensorTemp.currentC'] }
+                  keyword: { type: string }
+                  message: { type: string }
+
+    Jwks:
+      type: object
+      additionalProperties: false
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [kty, crv, x, y, kid, use, alg]
+            properties:
+              kty: { type: string, const: EC }
+              crv: { type: string, const: P-256 }
+              x: { type: string }
+              y: { type: string }
+              kid: { type: string }
+              use: { type: string, const: sig }
+              alg: { type: string, const: ES256 }
+
+    Ledger:
+      type: object
+      additionalProperties: false
+      required: [tenant, entries]
+      properties:
+        tenant: { type: string }
+        entries:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [sequence, sealId, issuedAt, sampleId, status, disposition, payloadHash, previousHash, chainHash, signer]
+            properties:
+              sequence: { type: integer, minimum: 1 }
+              sealId: { type: string }
+              issuedAt: { type: string, format: date-time }
+              sampleId: { type: string }
+              status: { $ref: '#/components/schemas/Status' }
+              disposition: { $ref: '#/components/schemas/Disposition' }
+              payloadHash: { $ref: '#/components/schemas/Sha256Hex' }
+              previousHash: { $ref: '#/components/schemas/Sha256Hex' }
+              chainHash: { $ref: '#/components/schemas/Sha256Hex' }
+              signer: { type: string }
