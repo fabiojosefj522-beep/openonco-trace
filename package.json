@@ -3,9 +3,13 @@
   "private": true,
   "description": "Monorepo open-core do OpenOnco-Trace: pacotes @openonco/sdk e @openonco/badge, mock do contrato Enterprise e demo.",
   "license": "Apache-2.0",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "node scripts/build-standalone.js",
-    "test": "node scripts/build-standalone.js && node test/flow.test.js && node test/flow.test.js standalone && node test/insecure.test.js"
+    "schema": "node scripts/export-schema.js",
+    "test": "node scripts/export-schema.js --check && node scripts/build-standalone.js && node test/flow.test.js && node test/flow.test.js standalone && node test/insecure.test.js && node test/contract.test.js",
+    "test:contract": "node scripts/export-schema.js --check && node test/contract.test.js"
   }
 }
