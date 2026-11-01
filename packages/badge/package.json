@@ -1,0 +1,12 @@
+{
+  "name": "@openonco/badge",
+  "version": "1.0.0",
+  "description": "Web Component <onco-badge> do OpenOnco-Trace: status de custódia em tempo real para SAP, Veeva Vault, WMS e apps web.",
+  "license": "Apache-2.0",
+  "main": "onco-badge.js",
+  "browser": "onco-badge.js",
+  "files": ["onco-badge.js", "README.md"],
+  "peerDependencies": { "@openonco/sdk": "^1.0.0" },
+  "keywords": ["web-component", "custom-element", "chain-of-custody", "car-t", "mrna"],
+  "sideEffects": true
+}

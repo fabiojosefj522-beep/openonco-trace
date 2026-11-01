@@ -1,0 +1,6 @@
+OpenOnco-Trace
+Copyright 2026 os autores do OpenOnco-Trace
+
+Licenciado sob a Apache License, Version 2.0 (arquivo LICENSE).
+O servidor Enterprise real não faz parte deste repositório; mock/enterprise-mock.js
+é apenas uma simulação pública do contrato da API.

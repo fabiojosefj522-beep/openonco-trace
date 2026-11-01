@@ -2,7 +2,10 @@
 const { chromium } = require('playwright');
 const path = require('path');
 
-const FILE = 'file://' + path.resolve(__dirname, '..', 'index.html');
+// Por padrão testa index.html (scripts separados); passe "standalone" para testar o build em arquivo único.
+const TARGET = process.argv[2] === 'standalone' ? ['dist', 'openonco-trace-standalone.html'] : ['index.html'];
+const FILE = 'file://' + path.resolve(__dirname, '..', ...TARGET);
+console.log('Testando', FILE);
 const results = [];
 const check = (name, cond, extra = '') => { results.push({ name, ok: !!cond, extra }); console.log(`${cond ? 'PASS' : 'FAIL'}  ${name}${extra ? '  | ' + extra : ''}`); };
 
