@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/fabiojosefj522-beep/openonco-trace/actions/workflows/ci.yml/badge.svg)](https://github.com/fabiojosefj522-beep/openonco-trace/actions/workflows/ci.yml)
 
-**Demo online:** https://fabiojosefj522-beep.github.io/openonco-trace/ · [versão em arquivo único](https://fabiojosefj522-beep.github.io/openonco-trace/dist/openonco-trace-standalone.html)
+**Site:** https://fabiojosefj522-beep.github.io/openonco-trace/ · **Demo:** https://fabiojosefj522-beep.github.io/openonco-trace/demo/ · [versão em arquivo único](https://fabiojosefj522-beep.github.io/openonco-trace/demo/dist/openonco-trace-standalone.html)
 
 Rastreabilidade de custódia e validação de amostras biológicas para terapias personalizadas contra o câncer (CAR-T autólogo e vacinas de mRNA com neoantígenos), no modelo open-core.
 
@@ -31,7 +31,8 @@ Abra `index.html` no navegador. Não há build, dependências nem chamadas de re
 
 ```
 openonco-trace/
-├── index.html                      demo (carrega os arquivos abaixo)
+├── index.html                      demo (carrega os arquivos abaixo; publicada em /demo/)
+├── site/index.html                 landing page estática (publicada na raiz do site)
 ├── packages/
 │   ├── sdk/openonco-sdk.js         PARTE A · @openonco/sdk (Apache-2.0); dist/ e types/ são gerados
 │   │                               JSON Schema, validador, SHA-256, regras, OpenOncoSDK
@@ -88,7 +89,7 @@ O fluxo de A a Z cobre:
 
 - `.github/workflows/ci.yml` roda `npm test` em todo pull request e em todo push na `main`.
 - `.github/workflows/release.yml` publica os pacotes no npm, com proveniência, quando uma tag `vX.Y.Z` é enviada. Requer o segredo `NPM_TOKEN`; sem ele, apenas testa.
-- `.github/workflows/pages.yml` publica a demo no GitHub Pages a cada push na `main`. Para funcionar, é preciso ligar uma vez em **Settings > Pages > Source = GitHub Actions**.
+- `.github/workflows/pages.yml` publica a landing page na raiz e a demo em `/demo/` a cada push na `main`. Para funcionar, é preciso ligar uma vez em **Settings > Pages > Source = GitHub Actions**.
 
 ## Comunidade
 

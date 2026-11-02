@@ -4,6 +4,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/). 
 
 ## [Não lançado]
 
+### Adicionado
+- Landing page na raiz do site; a demo passa para `/demo/`.
+
 ## [1.0.0] - 2026-11-01
 
 Primeira versão pública.
