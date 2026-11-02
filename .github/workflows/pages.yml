@@ -1,4 +1,4 @@
-# Publica a demo no GitHub Pages a cada push na main.
+# Publica a landing page (raiz) e a demo (/demo/) no GitHub Pages a cada push na main.
 # Pré-requisito único: Settings > Pages > Build and deployment > Source = "GitHub Actions".
 name: Pages
 
@@ -29,8 +29,10 @@ jobs:
       - name: Monta o site
         run: |
           node scripts/build-standalone.js
-          mkdir -p _site
-          cp -r index.html packages mock demo openapi dist _site/
+          # Raiz: landing page. /demo/: a demo com todos os caminhos relativos intactos.
+          mkdir -p _site/demo
+          cp site/index.html _site/index.html
+          cp -r index.html packages mock demo openapi dist _site/demo/
           touch _site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3

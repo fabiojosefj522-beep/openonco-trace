@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenOnco-Trace: chain of identity API for cell therapy</title>
+<meta name="description" content="Validate every sample, seal every handoff and let any auditor verify it. Open-core chain of identity and custody API for cell and gene therapy.">
+<meta property="og:title" content="OpenOnco-Trace: chain of identity for cell therapy, as an API">
+<meta property="og:description" content="Integrate in a day. Pay per sample. Open source SDK, web component and OpenAPI contract.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fabiojosefj522-beep.github.io/openonco-trace/">
+<meta name="theme-color" content="#0f1113">
+<!-- Landing page do OpenOnco-Trace. Fonte de design: canvas "OpenOnco-Trace landing page" (Claude Design).
+     Página estática: sem JavaScript; a demo vive em /demo/. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0f1113}
+a{color:#e6e8eb}a:hover{color:#ffffff}
+</style>
+<style>html{scroll-behavior:smooth} a:focus-visible{outline:2px solid #4cc9f0;outline-offset:2px} @media (max-width:640px){h1{font-size:48px !important} h2{font-size:34px !important}}</style>
+</head>
+<body>
+<div style="background: #0f1113; color: #e6e8eb; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.55">
+
+  <!-- Navegação -->
+  <header style="border-bottom: 1px solid #23262b">
+    <nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+      <a href="#top" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #e6e8eb">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#e6e8eb" stroke-width="2" aria-hidden="true"><rect x="3" y="10.5" width="16" height="11" rx="5.5"></rect><rect x="13" y="10.5" width="16" height="11" rx="5.5"></rect></svg>
+        <span style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.01em">OpenOnco-Trace</span>
+      </a>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; font-size: 15px">
+        <a href="#how" style="text-decoration: none; color: #b4bac4">How it works</a>
+        <a href="#pricing" style="text-decoration: none; color: #b4bac4">Pricing</a>
+        <a href="https://github.com/fabiojosefj522-beep/openonco-trace" style="text-decoration: none; color: #b4bac4">GitHub</a>
+        <a href="https://fabiojosefj522-beep.github.io/openonco-trace/demo/" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 8px; background: #2bff88; color: #0b0d0f; font-weight: 600; text-decoration: none">Try the sandbox</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section id="top" style="max-width: 1200px; margin: 0 auto; padding: 88px 24px 96px; display: flex; flex-wrap: wrap; align-items: center; gap: 56px">
+    <div style="flex: 1 1 480px; min-width: 0">
+      <p style="display: inline-flex; align-items: center; gap: 8px; margin: 0 0 28px; padding: 6px 12px; border: 1px solid #2c3036; border-radius: 999px; font-size: 14px; color: #b4bac4">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #2bff88" aria-hidden="true"></span>
+        v1.0.0 is out, open source under Apache-2.0
+      </p>
+      <h1 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 68px; line-height: 1.02; letter-spacing: -0.01em; max-width: 13ch">Chain of identity for cell therapy, as an API.</h1>
+      <p style="margin: 28px 0 0; font-size: 20px; line-height: 1.5; color: #b4bac4; max-width: 34em">Validate every sample, seal every handoff and let any auditor verify it. Integrate in a day. Pay per sample.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px">
+        <a href="https://fabiojosefj522-beep.github.io/openonco-trace/demo/" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 8px; background: #2bff88; color: #0b0d0f; font-weight: 600; font-size: 17px; text-decoration: none">Try the sandbox</a>
+        <a href="https://github.com/fabiojosefj522-beep/openonco-trace/blob/main/openapi/openonco-trace.v1.yaml" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 8px; border: 1px solid #3a3f47; color: #e6e8eb; font-weight: 600; font-size: 17px; text-decoration: none">Read the API spec</a>
+      </div>
+      <p style="margin: 18px 0 0; font-size: 14px; color: #8f96a1">No sign-up. The sandbox runs in your browser.</p>
+    </div>
+
+    <!-- Badge de status, a peça principal -->
+    <figure aria-label="Example of a sealed sample in the onco-badge component" style="flex: 1 1 400px; min-width: 0; max-width: 480px; margin: 0">
+      <div style="position: relative; background: #121214; border: 1px solid #26262c; border-radius: 12px; overflow: hidden; box-shadow: 0 30px 80px -30px rgba(0,0,0,0.9)">
+        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #2bff88" aria-hidden="true"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 12px 22px; border-bottom: 1px solid #26262c; font-size: 14px; font-weight: 600">
+          <span>OpenOnco-Trace</span>
+          <span style="padding: 3px 8px; border: 1px solid #2bff88; border-radius: 4px; color: #2bff88; font-size: 12px">Enterprise</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px; padding: 22px 22px 18px">
+          <span style="flex: none; width: 16px; height: 16px; border-radius: 50%; background: #2bff88; box-shadow: 0 0 0 4px rgba(43,255,136,0.14), 0 0 18px rgba(43,255,136,0.7)" aria-hidden="true"></span>
+          <div>
+            <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.05; letter-spacing: 0.03em; color: #2bff88">CUSTODY VERIFIED</div>
+            <div style="margin-top: 4px; font-size: 14px; color: #a4a4b0">Record sealed. Released for processing.</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; padding: 16px 22px; border-top: 1px solid #26262c; font-size: 13px">
+          <div><div style="color: #a4a4b0">Patient</div><div style="font-family: 'IBM Plex Mono', monospace">PT-BR-004217 <span style="color: #2bff88">COI ok</span></div></div>
+          <div><div style="color: #a4a4b0">Order</div><div style="font-family: 'IBM Plex Mono', monospace">ORD-CT8X41QZ</div></div>
+          <div><div style="color: #a4a4b0">Material</div><div>Fresh leukapheresis (CAR-T)</div></div>
+          <div><div style="color: #a4a4b0">Temperature</div><div><span style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; color: #2bff88">4.6 °C</span> <span style="color: #a4a4b0">range 2–8</span></div></div>
+        </div>
+        <div style="margin: 0 22px 22px; padding: 14px 16px; border: 1px solid rgba(43,255,136,0.35); border-radius: 8px; background: #18181c; font-size: 13px; display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 6px 12px">
+          <span style="color: #a4a4b0">Seal</span><span style="font-family: 'IBM Plex Mono', monospace">OOT-SEAL-20261101-000001</span>
+          <span style="color: #a4a4b0">SHA-256</span><span style="font-family: 'IBM Plex Mono', monospace">81812c3c01…727f6572</span>
+          <span style="color: #a4a4b0">Signature</span><span>ES256, verified by the SDK</span>
+          <span style="color: #a4a4b0">Signed by</span><span>Ana Souza, review and approval</span>
+        </div>
+      </div>
+      <figcaption style="margin-top: 12px; font-size: 13px; color: #8f96a1">The &lt;onco-badge&gt; web component, as it appears inside SAP, Veeva Vault or a WMS. Example data.</figcaption>
+    </figure>
+  </section>
+
+  <!-- Antes e depois -->
+  <section style="border-top: 1px solid #23262b; background: #131518">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px">
+      <h2 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 44px; line-height: 1.1; max-width: 22ch">Orchestration software is sold as projects. This is a protocol.</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 44px">
+        <div style="flex: 1 1 360px; min-width: 0; padding: 32px; border: 1px solid #2c3036; border-radius: 12px">
+          <h3 style="margin: 0 0 18px; font-size: 18px; font-weight: 600; color: #b4bac4">The usual way</h3>
+          <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px; color: #c4c9d1">
+            <li>Months of implementation before the first patient is scheduled.</li>
+            <li>A separate integration for every hospital, courier and manufacturer.</li>
+            <li>Custody records that only the vendor can vouch for.</li>
+          </ul>
+        </div>
+        <div style="flex: 1 1 360px; min-width: 0; padding: 32px; border: 1px solid #2bff88; border-radius: 12px; background: #121214">
+          <h3 style="margin: 0 0 18px; font-size: 18px; font-weight: 600; color: #2bff88">With OpenOnco-Trace</h3>
+          <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px">
+            <li>An open JSON Schema and OpenAPI 3.1 contract you can read today.</li>
+            <li>A drop-in SDK and web component for SAP, Veeva Vault, a WMS or any web app.</li>
+            <li>Signed seals that anyone can check with a public key.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Como funciona -->
+  <section id="how" style="border-top: 1px solid #23262b">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px">
+      <h2 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 44px; line-height: 1.1">How it works</h2>
+      <ol style="list-style: none; margin: 44px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 24px">
+        <li style="flex: 1 1 300px; min-width: 0; padding-top: 24px; border-top: 2px solid #3a3f47">
+          <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1; color: #6f7680">1</div>
+          <h3 style="margin: 14px 0 10px; font-size: 21px; font-weight: 600">Capture and check</h3>
+          <p style="margin: 0; color: #b4bac4">The SDK validates the sample against the schema and runs the open rules offline: patient identity, temperature, viability and custody order.</p>
+        </li>
+        <li style="flex: 1 1 300px; min-width: 0; padding-top: 24px; border-top: 2px solid #3a3f47">
+          <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1; color: #6f7680">2</div>
+          <h3 style="margin: 14px 0 10px; font-size: 21px; font-weight: 600">Seal</h3>
+          <p style="margin: 0; color: #b4bac4">The API re-checks everything on the server clock, then issues a SHA-256 hash, an ES256 signature and a hash-chained audit entry.</p>
+        </li>
+        <li style="flex: 1 1 300px; min-width: 0; padding-top: 24px; border-top: 2px solid #2bff88">
+          <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1; color: #2bff88">3</div>
+          <h3 style="margin: 14px 0 10px; font-size: 21px; font-weight: 600">Verify anywhere</h3>
+          <p style="margin: 0; color: #b4bac4">Hospitals, auditors and partners verify the seal with the published key. No account, no license.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Código -->
+  <section style="border-top: 1px solid #23262b; background: #131518">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start">
+      <div style="flex: 1 1 320px; min-width: 0">
+        <h2 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 44px; line-height: 1.1">Your first sealed sample in a few lines</h2>
+        <p style="margin: 20px 0 0; color: #b4bac4; max-width: 30em">One script tag or one import. The API key stays on your backend; the browser only talks to your proxy.</p>
+        <p style="margin: 16px 0 0; color: #b4bac4; max-width: 30em">Ships as ES module, CommonJS and plain script, with TypeScript types generated from the schema. npm packages are coming soon; until then, load it from jsDelivr.</p>
+      </div>
+      <div style="flex: 1.4 1 480px; min-width: 0; background: #0b0c0e; border: 1px solid #26262c; border-radius: 12px; overflow-x: auto">
+        <div style="padding: 10px 16px; border-bottom: 1px solid #26262c; font-size: 13px; color: #8f96a1">index.html</div>
+<pre style="margin: 0; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #d3d7de; white-space: pre"><span style="color: #8f96a1">&lt;!-- 1. Load the SDK and the component --&gt;</span>
+&lt;script src="https://cdn.jsdelivr.net/gh/fabiojosefj522-beep/
+  openonco-trace@v1.0.0/packages/sdk/openonco-sdk.js"&gt;&lt;/script&gt;
+&lt;script src="…/packages/badge/onco-badge.js"&gt;&lt;/script&gt;
+
+&lt;onco-badge id="badge"&gt;&lt;/onco-badge&gt;
+
+&lt;script&gt;
+  <span style="color: #8f96a1">// 2. Point it at your backend proxy</span>
+  const sdk = new OpenOncoSDK({
+    endpoint: 'https://your-backend/openonco',
+    operator: { userId: 'qa.asouza', printedName: 'Ana Souza' }
+  });
+
+  <span style="color: #8f96a1">// 3. Track, show and seal</span>
+  const rec = sdk.track(sample);
+  badge.sdk = sdk;
+  badge.sampleId = rec.sampleId;
+  const result = await sdk.submit(rec.sampleId);
+&lt;/script&gt;</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recursos -->
+  <section style="border-top: 1px solid #23262b">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px">
+      <h2 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 44px; line-height: 1.1">Built for regulated custody</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 40px 32px; margin-top: 44px">
+        <div style="flex: 1 1 320px; min-width: 0">
+          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 600">Chain of identity checks</h3>
+          <p style="margin: 0; color: #b4bac4">The patient on the label must match the manufacturing order. A transposed digit stops the line before it reaches the patient.</p>
+        </div>
+        <div style="flex: 1 1 320px; min-width: 0">
+          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 600">Live thermal watch</h3>
+          <p style="margin: 0; color: #b4bac4">Data-logger readings are re-evaluated as they arrive: verified, thermal attention or critical, with excursions kept on record.</p>
+        </div>
+        <div style="flex: 1 1 320px; min-width: 0">
+          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 600">Viability gates</h3>
+          <p style="margin: 0; color: #b4bac4">Cell viability for apheresis, tumor content for biopsies and stability windows per material type.</p>
+        </div>
+        <div style="flex: 1 1 320px; min-width: 0">
+          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 600">Compliance controls built in</h3>
+          <p style="margin: 0; color: #b4bac4">Audit trail, signature manifestation and record linking as in 21 CFR Part 11 (11.10(e), 11.50, 11.70), mapped to Anvisa RDC 658/2022, IN 134/2022 and IN 270/2023.</p>
+        </div>
+        <div style="flex: 1 1 320px; min-width: 0">
+          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 600">Privacy by schema</h3>
+          <p style="margin: 0; color: #b4bac4">Pseudonymous IDs only. Names, national IDs and unknown fields are rejected before they leave the browser.</p>
+        </div>
+        <div style="flex: 1 1 320px; min-width: 0">
+          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 600">Open core</h3>
+          <p style="margin: 0; color: #b4bac4">SDK, web component, schema and API spec under Apache-2.0. Run the checks yourself; pay only for sealed samples.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Preços -->
+  <section id="pricing" style="border-top: 1px solid #23262b; background: #131518">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px">
+      <h2 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 44px; line-height: 1.1">Pricing</h2>
+      <p style="margin: 16px 0 0; color: #b4bac4; max-width: 40em">Start free in the sandbox. Pay per sample when records need regulatory validity.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 44px; align-items: stretch">
+        <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; padding: 32px; border: 1px solid #2c3036; border-radius: 12px; background: #0f1113">
+          <h3 style="margin: 0; font-size: 20px; font-weight: 600">Sandbox</h3>
+          <p style="margin: 18px 0 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 48px; line-height: 1">$0</p>
+          <p style="margin: 8px 0 0; color: #b4bac4">Build and test the integration.</p>
+          <ul style="margin: 24px 0 32px; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: #c4c9d1; flex-grow: 1">
+            <li>Local schema validation and rules</li>
+            <li>100 sandbox calls per day</li>
+            <li>Results marked as having no regulatory validity</li>
+          </ul>
+          <a href="https://fabiojosefj522-beep.github.io/openonco-trace/demo/" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 8px; border: 1px solid #3a3f47; color: #e6e8eb; font-weight: 600; text-decoration: none">Try the sandbox</a>
+        </div>
+        <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; padding: 32px; border: 1px solid #2bff88; border-radius: 12px; background: #121214">
+          <h3 style="margin: 0; font-size: 20px; font-weight: 600">Pay as you go</h3>
+          <p style="margin: 18px 0 0"><span style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 48px; line-height: 1">$99</span> <span style="color: #b4bac4">per sample</span></p>
+          <p style="margin: 8px 0 0; color: #b4bac4">For clinical trials and early commercial therapies. Your first 100 samples are free.</p>
+          <ul style="margin: 24px 0 32px; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: #c4c9d1; flex-grow: 1">
+            <li>Unlimited seals across each sample&#39;s custody</li>
+            <li>SHA-256 hash and ES256 signature on every seal</li>
+            <li>Hash-chained audit trail</li>
+            <li>Open verification for partners and auditors</li>
+            <li>Usage-based billing, no implementation fee</li>
+          </ul>
+          <a href="https://github.com/fabiojosefj522-beep/openonco-trace/issues/new?title=API%20key%20request" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 8px; background: #2bff88; color: #0b0d0f; font-weight: 600; text-decoration: none">Request an API key</a>
+        </div>
+        <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; padding: 32px; border: 1px solid #2c3036; border-radius: 12px; background: #0f1113">
+          <h3 style="margin: 0; font-size: 20px; font-weight: 600">Enterprise</h3>
+          <p style="margin: 18px 0 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 48px; line-height: 1">Custom</p>
+          <p style="margin: 8px 0 0; color: #b4bac4">For commercial programs at scale.</p>
+          <ul style="margin: 24px 0 32px; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: #c4c9d1; flex-grow: 1">
+            <li>Validation package for GAMP 5</li>
+            <li>Dedicated tenant and SSO</li>
+            <li>Service level agreement</li>
+            <li>Data residency options</li>
+          </ul>
+          <a href="https://github.com/fabiojosefj522-beep/openonco-trace/issues/new?title=Enterprise%20inquiry" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 8px; border: 1px solid #3a3f47; color: #e6e8eb; font-weight: 600; text-decoration: none">Talk to us</a>
+        </div>
+      </div>
+      <p style="margin: 28px 0 0; font-size: 14px; color: #8f96a1; max-width: 60em">Compliance with 21 CFR Part 11 and Anvisa regulations also depends on your validated system and procedures. OpenOnco-Trace provides the technical controls.</p>
+    </div>
+  </section>
+
+  <!-- Chamada final -->
+  <section id="contact" style="border-top: 1px solid #23262b">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px">
+      <div style="flex: 1 1 480px; min-width: 0">
+        <h2 style="margin: 0; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 52px; line-height: 1.05; max-width: 18ch">Watch a sample get sealed in thirty seconds.</h2>
+        <p style="margin: 18px 0 0; color: #b4bac4">Questions or a pilot in mind? <a href="https://github.com/fabiojosefj522-beep/openonco-trace/issues/new?title=Pilot%20request" style="color: #e6e8eb">Open a request on GitHub</a>.</p>
+      </div>
+      <a href="https://fabiojosefj522-beep.github.io/openonco-trace/demo/" style="display: inline-flex; align-items: center; min-height: 56px; padding: 0 28px; border-radius: 8px; background: #2bff88; color: #0b0d0f; font-weight: 600; font-size: 18px; text-decoration: none">Try the sandbox</a>
+    </div>
+  </section>
+
+  <!-- Rodapé -->
+  <footer style="border-top: 1px solid #23262b">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 32px; font-size: 14px; color: #8f96a1">
+      <p style="margin: 0">OpenOnco-Trace. Open core under Apache-2.0. Sandbox data is fictitious and thermal profiles are illustrative.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px">
+        <a href="https://github.com/fabiojosefj522-beep/openonco-trace" style="color: #b4bac4">GitHub</a>
+        <a href="https://github.com/fabiojosefj522-beep/openonco-trace/blob/main/SECURITY.md" style="color: #b4bac4">Security</a>
+        <a href="https://github.com/fabiojosefj522-beep/openonco-trace/blob/main/CHANGELOG.md" style="color: #b4bac4">Changelog</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
